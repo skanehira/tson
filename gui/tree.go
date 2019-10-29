@@ -30,7 +30,6 @@ func (t *Tree) UpdateView(g *Gui, i interface{}) {
 }
 
 func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
-	// e.g child is {"name": "gorilla", "lang": {"ja":"japan", "en": "english"}}
 	var nodes []*tview.TreeNode
 
 	switch node := node.(type) {
