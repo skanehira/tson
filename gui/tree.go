@@ -23,9 +23,8 @@ func NewTree() *Tree {
 
 func (t *Tree) UpdateView(g *Gui, i interface{}) {
 	g.App.QueueUpdateDraw(func() {
-		root := tview.NewTreeNode(".")
+		root := tview.NewTreeNode(".").SetChildren(t.AddNode(i))
 		t.SetRoot(root).SetCurrentNode(root)
-		t.AddNodes(root, t.AddNode(i))
 	})
 }
 
@@ -42,7 +41,7 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 			if isList && len(list) > 0 {
 				newNode.SetSelectable(true)
 			}
-			t.AddNodes(newNode, t.AddNode(v))
+			newNode.SetChildren(t.AddNode(v))
 			nodes = append(nodes, newNode)
 		}
 	case []interface{}:
@@ -51,7 +50,7 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 			case map[string]interface{}, []interface{}:
 				if reflect.ValueOf(n).Len() > 0 {
 					numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1))
-					t.AddNodes(numberNode, t.AddNode(v))
+					numberNode.SetChildren(t.AddNode(v))
 					nodes = append(nodes, numberNode)
 				}
 			default:
@@ -62,12 +61,6 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 		nodes = append(nodes, t.NewNodeWithLiteral(node))
 	}
 	return nodes
-}
-
-func (t *Tree) AddNodes(target *tview.TreeNode, nodes []*tview.TreeNode) {
-	for _, node := range nodes {
-		target.AddChild(node)
-	}
 }
 
 func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
