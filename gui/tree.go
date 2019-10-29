@@ -24,9 +24,7 @@ func (t *Tree) UpdateView(g *Gui, i interface{}) {
 	g.App.QueueUpdateDraw(func() {
 		root := tview.NewTreeNode(".")
 		t.SetRoot(root).SetCurrentNode(root)
-		for _, node := range t.AddNode(i) {
-			root.AddChild(node)
-		}
+		t.AddNodes(root, t.AddNode(i))
 	})
 }
 
@@ -44,24 +42,18 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 			if isList && len(list) > 0 {
 				newNode.SetSelectable(true)
 			}
-			for _, n := range t.AddNode(v) {
-				newNode.AddChild(n)
-			}
+			t.AddNodes(newNode, t.AddNode(v))
 			nodes = append(nodes, newNode)
 		}
 	case []interface{}:
 		for i, v := range node {
 			if list, isList := v.([]interface{}); isList && len(list) > 0 {
 				numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1))
-				for _, n := range t.AddNode(v) {
-					numberNode.AddChild(n)
-				}
+				t.AddNodes(numberNode, t.AddNode(v))
 				nodes = append(nodes, numberNode)
 			} else if m, isMap := v.(map[string]interface{}); isMap && len(m) > 0 {
 				numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1))
-				for _, n := range t.AddNode(v) {
-					numberNode.AddChild(n)
-				}
+				t.AddNodes(numberNode, t.AddNode(v))
 				nodes = append(nodes, numberNode)
 			} else {
 				nodes = append(nodes, t.AddNode(v)...)
@@ -71,6 +63,12 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 		nodes = append(nodes, t.NewNodeWithLiteral(node))
 	}
 	return nodes
+}
+
+func (t *Tree) AddNodes(target *tview.TreeNode, nodes []*tview.TreeNode) {
+	for _, node := range nodes {
+		target.AddChild(node)
+	}
 }
 
 func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
