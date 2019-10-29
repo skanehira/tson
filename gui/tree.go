@@ -84,6 +84,8 @@ func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
 		text = fmt.Sprintf("%f", v)
 	case bool:
 		text = fmt.Sprintf("%t", v)
+	case nil:
+		text = "null"
 	case string:
 		text = v
 	}
