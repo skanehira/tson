@@ -23,6 +23,7 @@ func New() *Gui {
 
 func (g *Gui) Run(i interface{}) error {
 	g.Tree.UpdateView(g, i)
+	g.Tree.SetKeybindings()
 
 	grid := tview.NewGrid().
 		AddItem(g.Tree, 0, 0, 1, 1, 0, 0, true)
