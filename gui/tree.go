@@ -2,6 +2,7 @@ package gui
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -47,15 +48,14 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 		}
 	case []interface{}:
 		for i, v := range node {
-			if list, isList := v.([]interface{}); isList && len(list) > 0 {
-				numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1))
-				t.AddNodes(numberNode, t.AddNode(v))
-				nodes = append(nodes, numberNode)
-			} else if m, isMap := v.(map[string]interface{}); isMap && len(m) > 0 {
-				numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1))
-				t.AddNodes(numberNode, t.AddNode(v))
-				nodes = append(nodes, numberNode)
-			} else {
+			switch n := v.(type) {
+			case map[string]interface{}, []interface{}:
+				if reflect.ValueOf(n).Len() > 0 {
+					numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1))
+					t.AddNodes(numberNode, t.AddNode(v))
+					nodes = append(nodes, numberNode)
+				}
+			default:
 				nodes = append(nodes, t.AddNode(v)...)
 			}
 		}
