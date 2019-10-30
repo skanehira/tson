@@ -86,11 +86,11 @@ func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
 	return node.SetText(text)
 }
 
-func (t *Tree) SetKeybindings() {
+func (t *Tree) SetKeybindings(g *Gui) {
 	t.SetSelectedFunc(func(node *tview.TreeNode) {
-		if len(node.GetChildren()) > 0 {
-			node.SetExpanded(!node.IsExpanded())
-		}
+		g.Input(node.GetText(), func(text string) {
+			node.SetText(text)
+		})
 	})
 
 	t.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
