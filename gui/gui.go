@@ -143,7 +143,7 @@ func (g *Gui) Search() {
 
 func (g *Gui) walk(node *tview.TreeNode, text string) []*tview.TreeNode {
 	var nodes []*tview.TreeNode
-	if strings.Index(node.GetText(), text) != -1 {
+	if strings.Index(strings.ToLower(node.GetText()), text) != -1 {
 		nodes = append(nodes, node)
 		return nodes
 	}
