@@ -86,6 +86,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			t.GetRoot().ExpandAll()
 		case 'l':
 			t.GetCurrentNode().SetExpanded(true)
+		case 'r':
+			g.LoadJSON()
 		}
 
 		return event
