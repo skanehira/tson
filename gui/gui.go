@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -66,10 +67,10 @@ func (g *Gui) Message(message, page string, doneFunc func()) {
 	g.Pages.AddAndSwitchToPage("message", g.Modal(modal, 80, 29), true).ShowPage("main")
 }
 
-func (g *Gui) Input(text string, doneFunc func(text string)) {
+func (g *Gui) Input(text, label string, doneFunc func(text string)) {
 	input := tview.NewInputField().SetText(text)
 	input.SetBorder(true)
-	input.SetLabel("field:").SetLabelWidth(6).SetDoneFunc(func(key tcell.Key) {
+	input.SetLabel(label).SetLabelWidth(7).SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
 			doneFunc(input.GetText())
 			g.Pages.RemovePage("input")
@@ -113,4 +114,44 @@ func (g *Gui) LoadJSON() {
 		SetTitleAlign(tview.AlignLeft)
 
 	g.Pages.AddAndSwitchToPage(pageName, g.Modal(form, 0, 8), true).ShowPage("main")
+}
+
+func (g *Gui) Search() {
+	pageName := "search"
+	if g.Pages.HasPage(pageName) {
+		g.Pages.ShowPage(pageName)
+	} else {
+		input := tview.NewInputField()
+		input.SetBorder(true).SetTitle("search").SetTitleAlign(tview.AlignLeft)
+		input.SetChangedFunc(func(text string) {
+			root := *g.Tree.OriginRoot
+			g.Tree.SetRoot(&root)
+			if text != "" {
+				root := g.Tree.GetRoot()
+				root.SetChildren(g.walk(root, text))
+			}
+		})
+		input.SetLabel("word").SetLabelWidth(5).SetDoneFunc(func(key tcell.Key) {
+			if key == tcell.KeyEnter {
+				g.Pages.HidePage(pageName)
+			}
+		})
+
+		g.Pages.AddAndSwitchToPage(pageName, g.Modal(input, 0, 3), true).ShowPage("main")
+	}
+}
+
+func (g *Gui) walk(node *tview.TreeNode, text string) []*tview.TreeNode {
+	var nodes []*tview.TreeNode
+	if strings.Index(node.GetText(), text) != -1 {
+		nodes = append(nodes, node)
+		return nodes
+	}
+
+	for _, node := range node.GetChildren() {
+		nodes = append(nodes, g.walk(node, text)...)
+	}
+
+	return nodes
+
 }

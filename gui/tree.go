@@ -10,6 +10,7 @@ import (
 
 type Tree struct {
 	*tview.TreeView
+	OriginRoot *tview.TreeNode
 }
 
 func NewTree() *Tree {
@@ -25,6 +26,8 @@ func (t *Tree) UpdateView(g *Gui, i interface{}) {
 	g.App.QueueUpdateDraw(func() {
 		root := tview.NewTreeNode(".").SetChildren(t.AddNode(i))
 		t.SetRoot(root).SetCurrentNode(root)
+		originRoot := *root
+		t.OriginRoot = &originRoot
 	})
 }
 
@@ -69,7 +72,7 @@ func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
 
 func (t *Tree) SetKeybindings(g *Gui) {
 	t.SetSelectedFunc(func(node *tview.TreeNode) {
-		g.Input(node.GetText(), func(text string) {
+		g.Input(node.GetText(), "filed", func(text string) {
 			node.SetText(text)
 		})
 	})
@@ -88,6 +91,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			t.GetCurrentNode().SetExpanded(true)
 		case 'r':
 			g.LoadJSON()
+		case '/':
+			g.Search()
 		}
 
 		return event
