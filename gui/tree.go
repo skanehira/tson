@@ -92,4 +92,21 @@ func (t *Tree) SetKeybindings() {
 			node.SetExpanded(!node.IsExpanded())
 		}
 	})
+
+	t.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		switch event.Rune() {
+		case 'h':
+			node := t.GetCurrentNode()
+			if node != nil {
+				node.SetExpanded(false)
+			}
+		case 'l':
+			node := t.GetCurrentNode()
+			if node != nil {
+				node.SetExpanded(true)
+			}
+		}
+
+		return event
+	})
 }
