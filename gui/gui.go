@@ -52,7 +52,7 @@ func (g *Gui) Input(text string, doneFunc func(text string)) {
 	input.SetLabel("field:").SetLabelWidth(6).SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
 			doneFunc(input.GetText())
-			g.Pages.SendToBack("input")
+			g.Pages.RemovePage("input")
 		}
 	})
 
