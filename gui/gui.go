@@ -80,10 +80,9 @@ func (g *Gui) Input(text string, doneFunc func(text string)) {
 }
 
 func (g *Gui) LoadJSON() {
-	width := 30
 	pageName := "read_from_file"
 	form := tview.NewForm()
-	form.AddInputField("file", "", width, nil, nil).
+	form.AddInputField("file", "", 0, nil, nil).
 		AddButton("read", func() {
 			file := form.GetFormItem(0).(*tview.InputField).GetText()
 			file = os.ExpandEnv(file)
