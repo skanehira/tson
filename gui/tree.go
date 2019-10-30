@@ -96,15 +96,13 @@ func (t *Tree) SetKeybindings(g *Gui) {
 	t.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Rune() {
 		case 'h':
-			node := t.GetCurrentNode()
-			if node != nil {
-				node.SetExpanded(false)
-			}
+			t.GetCurrentNode().SetExpanded(false)
+		case 'H':
+			t.GetRoot().CollapseAll()
+		case 'L':
+			t.GetRoot().ExpandAll()
 		case 'l':
-			node := t.GetCurrentNode()
-			if node != nil {
-				node.SetExpanded(true)
-			}
+			t.GetCurrentNode().SetExpanded(true)
 		}
 
 		return event
