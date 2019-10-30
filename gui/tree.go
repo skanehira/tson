@@ -64,26 +64,7 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 }
 
 func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
-	var text string
-	node := tview.NewTreeNode("")
-	switch v := i.(type) {
-	case int32:
-		text = fmt.Sprintf("%d", v)
-	case int64:
-		text = fmt.Sprintf("%d", v)
-	case float32:
-		text = fmt.Sprintf("%f", v)
-	case float64:
-		text = fmt.Sprintf("%f", v)
-	case bool:
-		text = fmt.Sprintf("%t", v)
-	case nil:
-		text = "null"
-	case string:
-		text = v
-	}
-
-	return node.SetText(text)
+	return tview.NewTreeNode(fmt.Sprintf("%v", i))
 }
 
 func (t *Tree) SetKeybindings(g *Gui) {
