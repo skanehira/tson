@@ -80,6 +80,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			t.GetCurrentNode().SetExpanded(false)
 		case 'H':
 			t.GetRoot().CollapseAll()
+		case 'd':
+			t.GetCurrentNode().ClearChildren()
 		case 'L':
 			t.GetRoot().ExpandAll()
 		case 'l':
