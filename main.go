@@ -2,14 +2,43 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/skanehira/tson/gui"
 	"golang.org/x/crypto/ssh/terminal"
 )
+
+var (
+	enableLog = flag.Bool("log", false, "enable log")
+)
+
+func init() {
+	flag.Parse()
+	if *enableLog {
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		logWriter, err := os.OpenFile(filepath.Join(home, "tson.log"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		log.SetOutput(logWriter)
+		log.SetFlags(log.Lshortfile)
+	} else {
+		log.SetOutput(ioutil.Discard)
+	}
+}
 
 func run() int {
 	if !terminal.IsTerminal(0) {
