@@ -39,8 +39,16 @@ func (g *Gui) Run(i interface{}) error {
 	return nil
 }
 
+func (g *Gui) Modal(p tview.Primitive, width, height int) tview.Primitive {
+	return tview.NewGrid().
+		SetColumns(0, width, 0).
+		SetRows(0, height, 0).
+		AddItem(p, 1, 1, 1, 1, 0, 0, true)
+}
+
 func (g *Gui) Input(text string, doneFunc func(text string)) {
 	input := tview.NewInputField().SetText(text)
+	input.SetBorder(true)
 	input.SetLabel("field:").SetLabelWidth(6).SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
 			doneFunc(input.GetText())
@@ -48,5 +56,5 @@ func (g *Gui) Input(text string, doneFunc func(text string)) {
 		}
 	})
 
-	g.Pages.AddPage("input", input, true, true).SendToFront("input").ShowPage("main")
+	g.Pages.AddAndSwitchToPage("input", g.Modal(input, 0, 3), true).ShowPage("main")
 }
