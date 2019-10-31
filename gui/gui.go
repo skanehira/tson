@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -154,4 +155,41 @@ func (g *Gui) walk(node *tview.TreeNode, text string) []*tview.TreeNode {
 
 	return nodes
 
+}
+
+func (g *Gui) SaveJSON() {
+	pageName := "save_to_file"
+	form := tview.NewForm()
+	form.AddInputField("file", "", 0, nil, nil).
+		AddButton("save", func() {
+			fileName := form.GetFormItem(0).(*tview.InputField).GetText()
+			fileName = os.ExpandEnv(fileName)
+
+			var b bytes.Buffer
+			enc := json.NewEncoder(&b)
+			enc.SetIndent("", "  ")
+
+			if err := enc.Encode(g.Tree.OriginJSON); err != nil {
+				msg := fmt.Sprintf("can't make json: %s", err)
+				log.Println(msg)
+				g.Message(msg, "main", func() {})
+				return
+			}
+
+			if err := ioutil.WriteFile(fileName, b.Bytes(), 0666); err != nil {
+				msg := fmt.Sprintf("can't create file: %s", err)
+				log.Println(msg)
+				g.Message(msg, "main", func() {})
+				return
+			}
+			g.Pages.RemovePage(pageName)
+		}).
+		AddButton("cancel", func() {
+			g.Pages.RemovePage(pageName)
+		})
+
+	form.SetBorder(true).SetTitle("save to file").
+		SetTitleAlign(tview.AlignLeft)
+
+	g.Pages.AddAndSwitchToPage(pageName, g.Modal(form, 0, 8), true).ShowPage("main")
 }

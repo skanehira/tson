@@ -11,6 +11,7 @@ import (
 type Tree struct {
 	*tview.TreeView
 	OriginRoot *tview.TreeNode
+	OriginJSON interface{}
 }
 
 func NewTree() *Tree {
@@ -28,6 +29,7 @@ func (t *Tree) UpdateView(g *Gui, i interface{}) {
 		t.SetRoot(root).SetCurrentNode(root)
 		originRoot := *root
 		t.OriginRoot = &originRoot
+		t.OriginJSON = i
 	})
 }
 
@@ -91,6 +93,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			t.GetCurrentNode().SetExpanded(true)
 		case 'r':
 			g.LoadJSON()
+		case 's':
+			g.SaveJSON()
 		case '/':
 			g.Search()
 		}
