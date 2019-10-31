@@ -4,6 +4,10 @@ This tool displays JSON as a tree and you can search and edit key or values.
 
 ![](https://i.imgur.com/tBGLEsT.gif)
 
+## Support OS
+- Mac
+- Linux
+
 ## Installtion
 ```sh
 $ git clone https://github.com/skanehira/tson
