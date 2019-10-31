@@ -40,13 +40,9 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 	case map[string]interface{}:
 		for k, v := range node {
 			newNode := t.NewNodeWithLiteral(k).
-				SetColor(tcell.ColorMediumSlateBlue).SetReference(k)
+				SetColor(tcell.ColorMediumSlateBlue).
+				SetChildren(t.AddNode(v))
 
-			list, isList := v.([]interface{})
-			if isList && len(list) > 0 {
-				newNode.SetSelectable(true)
-			}
-			newNode.SetChildren(t.AddNode(v))
 			nodes = append(nodes, newNode)
 		}
 	case []interface{}:
@@ -54,8 +50,8 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 			switch n := v.(type) {
 			case map[string]interface{}, []interface{}:
 				if reflect.ValueOf(n).Len() > 0 {
-					numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1))
-					numberNode.SetChildren(t.AddNode(v))
+					numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1)).
+						SetChildren(t.AddNode(v))
 					nodes = append(nodes, numberNode)
 				}
 			default:
