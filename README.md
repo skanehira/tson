@@ -8,10 +8,10 @@ This tool displays JSON as a tree and you can search and edit key or values.
 - Mac
 - Linux
 
-## Installtion
+## Installation
 ```sh
 $ git clone https://github.com/skanehira/tson
-$ cd && go install
+$ cd tson && go install
 ```
 
 ## Usage
@@ -19,8 +19,8 @@ $ cd && go install
 $ tson < test.json
 ```
 
-## keybinding
-### json tree
+## Keybinding
+### JSON tree
 
 | key    | description         |
 |--------|---------------------|
