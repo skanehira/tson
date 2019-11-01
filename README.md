@@ -16,7 +16,11 @@ $ cd tson && go install
 
 ## Usage
 ```sh
+# fromstdin
 $ tson < test.json
+
+# from url(only run http get)
+$ tson -url http://gorilla/likes/json
 ```
 
 ## Keybinding
