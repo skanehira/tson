@@ -76,7 +76,7 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 					objectNode := tview.NewTreeNode("{object}").
 						SetChildren(t.AddNode(v)).SetReference(Object)
 
-					log.Printf("key:%v value:%v value_kind:%v", i, v, "object")
+					log.Printf("value:%v value_kind:%v", v, "object")
 					nodes = append(nodes, objectNode)
 				}
 			default:
