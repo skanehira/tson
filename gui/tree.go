@@ -96,11 +96,12 @@ func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
 
 func (t *Tree) SetKeybindings(g *Gui) {
 	t.SetSelectedFunc(func(node *tview.TreeNode) {
-		nodeType := node.GetReference().(Type)
-		if nodeType == Root || nodeType == Object {
+		text := node.GetText()
+		if text == "{object}" || text == "{array}" || text == "{value}" {
 			return
 		}
-		g.Input(node.GetText(), "filed", func(text string) {
+		labelWidth := 5
+		g.Input(text, "text", labelWidth, func(text string) {
 			node.SetText(text)
 		})
 	})

@@ -69,10 +69,10 @@ func (g *Gui) Message(message, page string, doneFunc func()) {
 	g.Pages.AddAndSwitchToPage("message", g.Modal(modal, 80, 29), true).ShowPage("main")
 }
 
-func (g *Gui) Input(text, label string, doneFunc func(text string)) {
+func (g *Gui) Input(text, label string, width int, doneFunc func(text string)) {
 	input := tview.NewInputField().SetText(text)
 	input.SetBorder(true)
-	input.SetLabel(label).SetLabelWidth(7).SetDoneFunc(func(key tcell.Key) {
+	input.SetLabel(label).SetLabelWidth(width).SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter {
 			doneFunc(input.GetText())
 			g.Pages.RemovePage("input")
