@@ -241,6 +241,8 @@ func (g *Gui) parseValue(node *tview.TreeNode) interface{} {
 		return i
 	} else if f, err := strconv.ParseFloat(v, 64); err == nil {
 		return f
+	} else if b, err := strconv.ParseBool(v); err == nil {
+		return b
 	}
 	return v
 }
