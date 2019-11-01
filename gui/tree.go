@@ -30,11 +30,11 @@ func (t *Tree) UpdateView(g *Gui, i interface{}) {
 		var root *tview.TreeNode
 		switch r.Kind() {
 		case reflect.Map:
-			root = tview.NewTreeNode("{object}").SetReference(Object)
+			root = tview.NewTreeNode("{object}").SetReference(Reference{JSONType: Object})
 		case reflect.Slice:
-			root = tview.NewTreeNode("{array}").SetReference(Array)
+			root = tview.NewTreeNode("{array}").SetReference(Reference{JSONType: Array})
 		default:
-			root = tview.NewTreeNode("{value}").SetReference(Key)
+			root = tview.NewTreeNode("{value}").SetReference(Reference{JSONType: Key})
 		}
 
 		root.SetChildren(t.AddNode(i))
@@ -57,11 +57,11 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 			r := reflect.ValueOf(v)
 
 			if r.Kind() == reflect.Slice {
-				newNode.SetReference(Array)
+				newNode.SetReference(Reference{JSONType: Array})
 			} else if r.Kind() == reflect.Map {
-				newNode.SetReference(Object)
+				newNode.SetReference(Reference{JSONType: Object})
 			} else {
-				newNode.SetReference(Key)
+				newNode.SetReference(Reference{JSONType: Key})
 			}
 
 			log.Printf("key:%v value:%v value_kind:%v", k, v, newNode.GetReference())
@@ -74,7 +74,7 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 				r := reflect.ValueOf(n)
 				if r.Kind() != reflect.Slice {
 					objectNode := tview.NewTreeNode("{object}").
-						SetChildren(t.AddNode(v)).SetReference(Object)
+						SetChildren(t.AddNode(v)).SetReference(Reference{JSONType: Object})
 
 					log.Printf("value:%v value_kind:%v", v, "object")
 					nodes = append(nodes, objectNode)
@@ -85,7 +85,21 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 		}
 	default:
 		log.Printf("value:%v value_kind:%v", node, "value")
-		nodes = append(nodes, t.NewNodeWithLiteral(node).SetReference(Value))
+		ref := reflect.ValueOf(node)
+		var valueType ValueType
+		switch ref.Kind() {
+		case reflect.Int:
+			valueType = Int
+		case reflect.Float64:
+			valueType = Float
+		case reflect.Bool:
+			valueType = Boolean
+		default:
+			valueType = String
+		}
+
+		nodes = append(nodes, t.NewNodeWithLiteral(node).
+			SetReference(Reference{JSONType: Value, ValueType: valueType}))
 	}
 	return nodes
 }

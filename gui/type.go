@@ -1,25 +1,47 @@
 package gui
 
-type Type int
+type JSONType int
 
 const (
-	Unknown Type = iota
-	Root
+	Root JSONType = iota + 1
 	Object
 	Array
 	Key
 	Value
 )
 
-var TypeMap = map[Type]string{
-	Unknown: "unknown",
-	Root:    "root",
-	Object:  "object",
-	Array:   "array",
-	Key:     "key",
-	Value:   "value",
+var jsonTypeMap = map[JSONType]string{
+	Object: "object",
+	Array:  "array",
+	Key:    "key",
+	Value:  "value",
 }
 
-func (t Type) String() string {
-	return TypeMap[t]
+func (t JSONType) String() string {
+	return jsonTypeMap[t]
+}
+
+type ValueType int
+
+const (
+	Int ValueType = iota + 1
+	String
+	Float
+	Boolean
+)
+
+var valueTypeMap = map[ValueType]string{
+	Int:     "int",
+	String:  "string",
+	Float:   "float",
+	Boolean: "boolean",
+}
+
+func (v ValueType) String() string {
+	return valueTypeMap[v]
+}
+
+type Reference struct {
+	JSONType  JSONType
+	ValueType ValueType
 }

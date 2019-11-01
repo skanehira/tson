@@ -196,20 +196,10 @@ func (g *Gui) SaveJSON() {
 }
 
 func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
-	nodeType := node.GetReference().(Type)
+	ref := node.GetReference().(Reference)
 	children := node.GetChildren()
 
-	switch nodeType {
-	case Root:
-		if len(children) == 1 {
-			return g.makeJSON(children[0])
-		} else {
-			var i []interface{}
-			for _, n := range children {
-				i = append(i, g.makeJSON(n))
-			}
-			return i
-		}
+	switch ref.JSONType {
 	case Object:
 		i := make(map[string]interface{})
 		for _, n := range children {
@@ -224,7 +214,7 @@ func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
 		return i
 	case Key:
 		v := node.GetChildren()[0]
-		if v.GetReference().(Type) == Value {
+		if v.GetReference().(Reference).JSONType == Value {
 			return g.parseValue(v)
 		}
 		return map[string]interface{}{
@@ -237,12 +227,19 @@ func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
 
 func (g *Gui) parseValue(node *tview.TreeNode) interface{} {
 	v := node.GetText()
-	if i, err := strconv.Atoi(v); err == nil {
+	ref := node.GetReference().(Reference)
+
+	switch ref.ValueType {
+	case Int:
+		i, _ := strconv.Atoi(v)
 		return i
-	} else if f, err := strconv.ParseFloat(v, 64); err == nil {
+	case Float:
+		f, _ := strconv.ParseFloat(v, 64)
 		return f
-	} else if b, err := strconv.ParseBool(v); err == nil {
+	case Boolean:
+		b, _ := strconv.ParseBool(v)
 		return b
 	}
+
 	return v
 }
