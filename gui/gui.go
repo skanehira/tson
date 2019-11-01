@@ -130,7 +130,7 @@ func (g *Gui) Search() {
 			g.Tree.SetRoot(&root)
 			if text != "" {
 				root := g.Tree.GetRoot()
-				root.SetChildren(g.walk(root, text))
+				root.SetChildren(g.walk(root.GetChildren(), text))
 			}
 		})
 		input.SetLabel("word").SetLabelWidth(5).SetDoneFunc(func(key tcell.Key) {
@@ -143,19 +143,19 @@ func (g *Gui) Search() {
 	}
 }
 
-func (g *Gui) walk(node *tview.TreeNode, text string) []*tview.TreeNode {
-	var nodes []*tview.TreeNode
-	if strings.Index(strings.ToLower(node.GetText()), text) != -1 {
-		nodes = append(nodes, node)
-		return nodes
+func (g *Gui) walk(nodes []*tview.TreeNode, text string) []*tview.TreeNode {
+	var newNodes []*tview.TreeNode
+
+	for _, child := range nodes {
+		log.Println(child.GetText())
+		if strings.Index(strings.ToLower(child.GetText()), text) != -1 {
+			newNodes = append(newNodes, child)
+		} else {
+			newNodes = append(newNodes, g.walk(child.GetChildren(), text)...)
+		}
 	}
 
-	for _, node := range node.GetChildren() {
-		nodes = append(nodes, g.walk(node, text)...)
-	}
-
-	return nodes
-
+	return newNodes
 }
 
 func (g *Gui) SaveJSON() {
