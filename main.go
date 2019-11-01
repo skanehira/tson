@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -16,7 +18,17 @@ import (
 
 var (
 	enableLog = flag.Bool("log", false, "enable log")
+	url       = flag.String("url", "", "get json from url")
 )
+
+var (
+	errEmptyJSON = errors.New("empty json")
+)
+
+func printError(err error) int {
+	fmt.Fprintln(os.Stderr, err)
+	return 1
+}
 
 func init() {
 	flag.Parse()
@@ -29,8 +41,7 @@ func init() {
 
 		logWriter, err := os.OpenFile(filepath.Join(home, "tson.log"), os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			os.Exit(printError(err))
 		}
 
 		log.SetOutput(logWriter)
@@ -41,24 +52,42 @@ func init() {
 }
 
 func run() int {
+	if *url != "" {
+		resp, err := http.Get(*url)
+		if err != nil {
+			return printError(err)
+		}
+
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return printError(err)
+		}
+
+		var i interface{}
+		if err := json.Unmarshal(b, &i); err != nil {
+			return printError(err)
+		}
+		if err := gui.New().Run(i); err != nil {
+			return printError(err)
+		}
+		return 0
+	}
+
 	if !terminal.IsTerminal(0) {
 		b, err := ioutil.ReadAll(os.Stdin)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return 1
+			return printError(err)
 		}
 		if len(b) == 0 {
-			fmt.Println("json is empty")
-			return 0
+			return printError(err)
 		}
 
-		var t interface{}
-		if err := json.Unmarshal(b, &t); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return 1
+		var i interface{}
+		if err := json.Unmarshal(b, &i); err != nil {
+			return printError(err)
 		}
 
-		if err := gui.New().Run(t); err != nil {
+		if err := gui.New().Run(i); err != nil {
 			log.Println(err)
 			return 1
 		}
