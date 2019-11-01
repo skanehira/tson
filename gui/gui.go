@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gdamore/tcell"
@@ -165,18 +166,18 @@ func (g *Gui) SaveJSON() {
 			fileName := form.GetFormItem(0).(*tview.InputField).GetText()
 			fileName = os.ExpandEnv(fileName)
 
-			var b bytes.Buffer
-			enc := json.NewEncoder(&b)
+			var buf bytes.Buffer
+			enc := json.NewEncoder(&buf)
 			enc.SetIndent("", "  ")
 
-			if err := enc.Encode(g.Tree.OriginJSON); err != nil {
-				msg := fmt.Sprintf("can't make json: %s", err)
+			if err := enc.Encode(g.makeJSON(g.Tree.GetRoot())); err != nil {
+				msg := fmt.Sprintf("can't marshal json: %s", err)
 				log.Println(msg)
 				g.Message(msg, "main", func() {})
 				return
 			}
 
-			if err := ioutil.WriteFile(fileName, b.Bytes(), 0666); err != nil {
+			if err := ioutil.WriteFile(fileName, buf.Bytes(), 0666); err != nil {
 				msg := fmt.Sprintf("can't create file: %s", err)
 				log.Println(msg)
 				g.Message(msg, "main", func() {})
@@ -192,4 +193,54 @@ func (g *Gui) SaveJSON() {
 		SetTitleAlign(tview.AlignLeft)
 
 	g.Pages.AddAndSwitchToPage(pageName, g.Modal(form, 0, 8), true).ShowPage("main")
+}
+
+func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
+	nodeType := node.GetReference().(Type)
+	children := node.GetChildren()
+
+	switch nodeType {
+	case Root:
+		if len(children) == 1 {
+			return g.makeJSON(children[0])
+		} else {
+			var i []interface{}
+			for _, n := range children {
+				i = append(i, g.makeJSON(n))
+			}
+			return i
+		}
+	case Object:
+		i := make(map[string]interface{})
+		for _, n := range children {
+			i[n.GetText()] = g.makeJSON(n)
+		}
+		return i
+	case Array:
+		var i []interface{}
+		for _, n := range children {
+			i = append(i, g.makeJSON(n))
+		}
+		return i
+	case Key:
+		v := node.GetChildren()[0]
+		if v.GetReference().(Type) == Value {
+			return g.parseValue(v)
+		}
+		return map[string]interface{}{
+			node.GetText(): g.makeJSON(v),
+		}
+	}
+
+	return g.parseValue(node)
+}
+
+func (g *Gui) parseValue(node *tview.TreeNode) interface{} {
+	v := node.GetText()
+	if i, err := strconv.Atoi(v); err == nil {
+		return i
+	} else if f, err := strconv.ParseFloat(v, 64); err == nil {
+		return f
+	}
+	return v
 }

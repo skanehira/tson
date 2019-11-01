@@ -2,6 +2,7 @@ package gui
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 
 	"github.com/gdamore/tcell"
@@ -11,7 +12,6 @@ import (
 type Tree struct {
 	*tview.TreeView
 	OriginRoot *tview.TreeNode
-	OriginJSON interface{}
 }
 
 func NewTree() *Tree {
@@ -25,11 +25,23 @@ func NewTree() *Tree {
 
 func (t *Tree) UpdateView(g *Gui, i interface{}) {
 	g.App.QueueUpdateDraw(func() {
-		root := tview.NewTreeNode(".").SetChildren(t.AddNode(i))
+		r := reflect.ValueOf(i)
+
+		var root *tview.TreeNode
+		switch r.Kind() {
+		case reflect.Map:
+			root = tview.NewTreeNode("{object}").SetReference(Object)
+		case reflect.Slice:
+			root = tview.NewTreeNode("{array}").SetReference(Array)
+		default:
+			root = tview.NewTreeNode("{value}").SetReference(Key)
+		}
+
+		root.SetChildren(t.AddNode(i))
 		t.SetRoot(root).SetCurrentNode(root)
+
 		originRoot := *root
 		t.OriginRoot = &originRoot
-		t.OriginJSON = i
 	})
 }
 
@@ -42,24 +54,38 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 			newNode := t.NewNodeWithLiteral(k).
 				SetColor(tcell.ColorMediumSlateBlue).
 				SetChildren(t.AddNode(v))
+			r := reflect.ValueOf(v)
 
+			if r.Kind() == reflect.Slice {
+				newNode.SetReference(Array)
+			} else if r.Kind() == reflect.Map {
+				newNode.SetReference(Object)
+			} else {
+				newNode.SetReference(Key)
+			}
+
+			log.Printf("key:%v value:%v value_kind:%v", k, v, newNode.GetReference())
 			nodes = append(nodes, newNode)
 		}
 	case []interface{}:
-		for i, v := range node {
+		for _, v := range node {
 			switch n := v.(type) {
-			case map[string]interface{}, []interface{}:
-				if reflect.ValueOf(n).Len() > 0 {
-					numberNode := tview.NewTreeNode(fmt.Sprintf("[%d]", i+1)).
-						SetChildren(t.AddNode(v))
-					nodes = append(nodes, numberNode)
+			case map[string]interface{}:
+				r := reflect.ValueOf(n)
+				if r.Kind() != reflect.Slice {
+					objectNode := tview.NewTreeNode("{object}").
+						SetChildren(t.AddNode(v)).SetReference(Object)
+
+					log.Printf("key:%v value:%v value_kind:%v", i, v, "object")
+					nodes = append(nodes, objectNode)
 				}
 			default:
 				nodes = append(nodes, t.AddNode(v)...)
 			}
 		}
 	default:
-		nodes = append(nodes, t.NewNodeWithLiteral(node))
+		log.Printf("value:%v value_kind:%v", node, "value")
+		nodes = append(nodes, t.NewNodeWithLiteral(node).SetReference(Value))
 	}
 	return nodes
 }
@@ -70,6 +96,10 @@ func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
 
 func (t *Tree) SetKeybindings(g *Gui) {
 	t.SetSelectedFunc(func(node *tview.TreeNode) {
+		nodeType := node.GetReference().(Type)
+		if nodeType == Root || nodeType == Object {
+			return
+		}
 		g.Input(node.GetText(), "filed", func(text string) {
 			node.SetText(text)
 		})
