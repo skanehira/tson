@@ -95,9 +95,14 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 		case reflect.Bool:
 			valueType = Boolean
 		default:
-			valueType = String
+			if node == nil {
+				valueType = Null
+			} else {
+				valueType = String
+			}
 		}
 
+		log.Printf("value_type:%v", valueType)
 		nodes = append(nodes, t.NewNodeWithLiteral(node).
 			SetReference(Reference{JSONType: Value, ValueType: valueType}))
 	}
@@ -105,6 +110,9 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 }
 
 func (t *Tree) NewNodeWithLiteral(i interface{}) *tview.TreeNode {
+	if i == nil {
+		return tview.NewTreeNode("null")
+	}
 	return tview.NewTreeNode(fmt.Sprintf("%v", i))
 }
 

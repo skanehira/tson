@@ -239,6 +239,8 @@ func (g *Gui) parseValue(node *tview.TreeNode) interface{} {
 	case Boolean:
 		b, _ := strconv.ParseBool(v)
 		return b
+	case Null:
+		return nil
 	}
 
 	return v

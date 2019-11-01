@@ -28,6 +28,7 @@ const (
 	String
 	Float
 	Boolean
+	Null
 )
 
 var valueTypeMap = map[ValueType]string{
@@ -35,6 +36,7 @@ var valueTypeMap = map[ValueType]string{
 	String:  "string",
 	Float:   "float",
 	Boolean: "boolean",
+	Null:    "null",
 }
 
 func (v ValueType) String() string {
