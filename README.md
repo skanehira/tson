@@ -1,5 +1,5 @@
 # tson
-`tson` is JSON viewer written in Go.
+`tson` is JSON viewer and editor written in Go.
 This tool displays JSON as a tree and you can search and edit key or values.
 
 ![](https://i.imgur.com/tBGLEsT.gif)
@@ -35,6 +35,7 @@ $ tson < test.json
 | l      | expand current node |
 | L      | expand all nodes    |
 | r      | read from file      |
+| s      | save to file        |
 | Enter  | edit node           |
 | /      | search nodes        |
 
