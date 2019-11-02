@@ -16,27 +16,15 @@ $ cd tson && go install
 
 ## Usage
 ```sh
-# fromstdin
+# from file
 $ tson < test.json
 
-# from url(only run http get)
+# from pipe
+$ curl -X POST http://gorilla/likes/regist | tson
+
+# from url(only can use http get mthod)
 $ tson -url http://gorilla/likes/json
 ```
-
-### About Editing nodes
-When editing a node value, the JSON value type is determined based on the value.
-For example, after inputed `10.5` and saving the JSON to a file, it will be output as a float type `10.5`.
-If the value sorround with `"`, it will be output as string type always.
-The following is a list of conversion rules.
-
-| input value        | json type |
-|--------------------|-----------|
-| `gorilla`          | string    |
-| `10.5`             | float     |
-| `5`                | int       |
-| `true` or `false`  | boolean   |
-| `null`             | null      |
-| `"10"` or `"true"` | string    |
 
 ## Keybinding
 ### JSON tree
@@ -55,8 +43,49 @@ The following is a list of conversion rules.
 | L      | expand all nodes    |
 | r      | read from file      |
 | s      | save to file        |
+| a      | add new node        |
 | Enter  | edit node           |
 | /      | search nodes        |
+
+## About editing nodes
+When editing a node value, the JSON value type is determined based on the value.
+For example, after inputed `10.5` and saving the JSON to a file, it will be output as a float type `10.5`.
+If the value sorround with `"`, it will be output as string type always.
+The following is a list of conversion rules.
+
+| input value        | json type |
+|--------------------|-----------|
+| `gorilla`          | string    |
+| `10.5`             | float     |
+| `5`                | int       |
+| `true` or `false`  | boolean   |
+| `null`             | null      |
+| `"10"` or `"true"` | string    |
+
+## About adding new node
+You can use `a` to add new node with raw json string.
+
+For expample, you have following tree.
+
+```
+{array} <- your cursor in there
+├──a
+├──b
+└──c
+```
+
+If you input `{"name":"gorilla"}` and press add button,
+then you will get new tree as following.
+
+```
+{array} <- your cursor in there
+├──a
+├──b
+├──c
+└──{object}
+   └──name
+      └──gorilla
+```
 
 # Author
 skanehira
