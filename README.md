@@ -48,7 +48,18 @@ $ tson -url http://gorilla/likes/json
 | d      | clear children nodes |
 | Enter  | edit node            |
 | /      | search nodes         |
-| ?      | show keybindings     |
+| ?      | show helps           |
+
+### help
+| key    | description        |
+|--------|--------------------|
+| j      | move down          |
+| k      | move up            |
+| g      | move to the top    |
+| G      | move to the bottom |
+| ctrl-f | page up            |
+| ctrl-b | page down          |
+| q      | close help         |
 
 ## About editing nodes
 When editing a node value, the JSON value type is determined based on the value.
