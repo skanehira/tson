@@ -145,6 +145,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			g.Search()
 		case 'a':
 			g.AddNode()
+		case 'A':
+			g.AddValue()
 		}
 
 		return event

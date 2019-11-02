@@ -292,6 +292,33 @@ func (g *Gui) AddNode() {
 	})
 }
 
+func (g *Gui) AddValue() {
+	labels := []string{"json"}
+	g.Form(labels, "add", "add new value", "add_new_value", 7, func(values map[string]string) error {
+		j := values[labels[0]]
+		if j == "" {
+			log.Println(ErrEmptyJSON)
+			return ErrEmptyJSON
+		}
+
+		buf := bytes.NewBufferString(j)
+		i, err := UnMarshalJSON(buf)
+		if err != nil {
+			return err
+		}
+
+		current := g.Tree.GetCurrentNode()
+		for _, n := range g.Tree.AddNode(i) {
+			current.AddChild(n)
+		}
+		// update new origin root node
+		g.Tree.OriginRoot = g.Tree.GetRoot()
+
+		return nil
+	})
+
+}
+
 func UnMarshalJSON(in io.Reader) (interface{}, error) {
 	b, err := ioutil.ReadAll(in)
 	if err != nil {
