@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -124,7 +126,12 @@ func (t *Tree) SetKeybindings(g *Gui) {
 		}
 		labelWidth := 5
 		g.Input(text, "text", labelWidth, func(text string) {
-			node.SetText(text)
+			ref := node.GetReference().(Reference)
+			ref.ValueType = parseValueType(text)
+			if ref.ValueType == String {
+				text = strings.Trim(text, `"`)
+			}
+			node.SetText(text).SetReference(ref)
 		})
 	})
 
@@ -150,4 +157,22 @@ func (t *Tree) SetKeybindings(g *Gui) {
 
 		return event
 	})
+}
+
+func parseValueType(text string) ValueType {
+	// if sorround with `"` set string type
+	if strings.HasPrefix(text, `"`) && strings.HasSuffix(text, `"`) {
+		return String
+	} else if "null" == text {
+		return Null
+	} else if text == "false" || text == "true" {
+		return Boolean
+	} else if _, err := strconv.ParseFloat(text, 64); err == nil {
+		return Float
+	} else if _, err := strconv.Atoi(text); err == nil {
+		return Int
+	}
+
+	log.Println(String.String())
+	return String
 }
