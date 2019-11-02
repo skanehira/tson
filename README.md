@@ -2,7 +2,7 @@
 `tson` is JSON viewer and editor written in Go.
 This tool displays JSON as a tree and you can search and edit key or values.
 
-![](https://i.imgur.com/tBGLEsT.gif)
+![](https://i.imgur.com/pWVVfd6.gif)
 
 ## Support OS
 - Mac
