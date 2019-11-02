@@ -60,7 +60,7 @@ func (g *Gui) Message(message, page string, doneFunc func()) {
 		AddButtons([]string{doneLabel}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			g.Pages.RemovePage("message")
-			g.Pages.SwitchToPage(page)
+			g.Pages.SwitchToPage(page).ShowPage("main")
 			if buttonLabel == doneLabel {
 				doneFunc()
 			}
@@ -82,40 +82,70 @@ func (g *Gui) Input(text, label string, width int, doneFunc func(text string)) {
 	g.Pages.AddAndSwitchToPage("input", g.Modal(input, 0, 3), true).ShowPage("main")
 }
 
-func (g *Gui) LoadJSON() {
-	pageName := "read_from_file"
+func (g *Gui) Form(fieldLabel []string, doneLabel, title, pageName string,
+	height int, doneFunc func(values map[string]string) error) {
+
+	if g.Pages.HasPage(pageName) {
+		g.Pages.ShowPage(pageName)
+		return
+	}
+
 	form := tview.NewForm()
-	form.AddInputField("file", "", 0, nil, nil).
-		AddButton("read", func() {
-			file := form.GetFormItem(0).(*tview.InputField).GetText()
-			file = os.ExpandEnv(file)
-			b, err := ioutil.ReadFile(file)
-			if err != nil {
-				msg := fmt.Sprintf("can't read file: %s", err)
-				log.Println(msg)
-				g.Message(msg, "main", func() {})
-				return
-			}
+	for _, label := range fieldLabel {
+		form.AddInputField(label, "", 0, nil, nil)
+	}
 
-			var i interface{}
-			if err := json.Unmarshal(b, &i); err != nil {
-				msg := fmt.Sprintf("can't read file: %s", err)
-				log.Println(msg)
-				g.Message(msg, "main", func() {})
-				return
-			}
+	form.AddButton(doneLabel, func() {
+		values := make(map[string]string)
 
-			g.Tree.UpdateView(g, i)
-			g.Pages.RemovePage(pageName)
-		}).
+		for _, label := range fieldLabel {
+			item := form.GetFormItemByLabel(label)
+			switch item.(type) {
+			case *tview.InputField:
+				input, ok := item.(*tview.InputField)
+				if ok {
+					values[label] = os.ExpandEnv(input.GetText())
+				}
+			}
+		}
+
+		if err := doneFunc(values); err != nil {
+			g.Message(err.Error(), pageName, func() {})
+			return
+		}
+
+		g.Pages.RemovePage(pageName)
+	}).
 		AddButton("cancel", func() {
 			g.Pages.RemovePage(pageName)
 		})
 
-	form.SetBorder(true).SetTitle("read from file").
+	form.SetBorder(true).SetTitle(title).
 		SetTitleAlign(tview.AlignLeft)
 
-	g.Pages.AddAndSwitchToPage(pageName, g.Modal(form, 0, 8), true).ShowPage("main")
+	g.Pages.AddAndSwitchToPage(pageName, g.Modal(form, 0, height), true).ShowPage("main")
+}
+
+func (g *Gui) LoadJSON() {
+	labels := []string{"file"}
+	g.Form(labels, "read", "read from file", "read_from_file", 7, func(values map[string]string) error {
+		file := values[labels[0]]
+		b, err := ioutil.ReadFile(file)
+		if err != nil {
+			log.Println(fmt.Sprintf("can't read file: %s", err))
+			return err
+		}
+
+		var i interface{}
+		if err := json.Unmarshal(b, &i); err != nil {
+			log.Println(fmt.Sprintf("can't unmarshal json: %s", err))
+			return err
+		}
+
+		g.Tree.UpdateView(g, i)
+
+		return nil
+	})
 }
 
 func (g *Gui) Search() {
@@ -159,40 +189,27 @@ func (g *Gui) walk(nodes []*tview.TreeNode, text string) []*tview.TreeNode {
 }
 
 func (g *Gui) SaveJSON() {
-	pageName := "save_to_file"
-	form := tview.NewForm()
-	form.AddInputField("file", "", 0, nil, nil).
-		AddButton("save", func() {
-			fileName := form.GetFormItem(0).(*tview.InputField).GetText()
-			fileName = os.ExpandEnv(fileName)
+	labels := []string{"file"}
+	g.Form(labels, "save", "save to file", "save_to_file", 7, func(values map[string]string) error {
+		file := values[labels[0]]
+		file = os.ExpandEnv(file)
 
-			var buf bytes.Buffer
-			enc := json.NewEncoder(&buf)
-			enc.SetIndent("", "  ")
+		var buf bytes.Buffer
+		enc := json.NewEncoder(&buf)
+		enc.SetIndent("", "  ")
 
-			if err := enc.Encode(g.makeJSON(g.Tree.GetRoot())); err != nil {
-				msg := fmt.Sprintf("can't marshal json: %s", err)
-				log.Println(msg)
-				g.Message(msg, "main", func() {})
-				return
-			}
+		if err := enc.Encode(g.makeJSON(g.Tree.GetRoot())); err != nil {
+			log.Println(fmt.Sprintf("can't marshal json: %s", err))
+			return err
+		}
 
-			if err := ioutil.WriteFile(fileName, buf.Bytes(), 0666); err != nil {
-				msg := fmt.Sprintf("can't create file: %s", err)
-				log.Println(msg)
-				g.Message(msg, "main", func() {})
-				return
-			}
-			g.Pages.RemovePage(pageName)
-		}).
-		AddButton("cancel", func() {
-			g.Pages.RemovePage(pageName)
-		})
+		if err := ioutil.WriteFile(file, buf.Bytes(), 0666); err != nil {
+			log.Println(fmt.Sprintf("can't create file: %s", err))
+			return err
+		}
 
-	form.SetBorder(true).SetTitle("save to file").
-		SetTitleAlign(tview.AlignLeft)
-
-	g.Pages.AddAndSwitchToPage(pageName, g.Modal(form, 0, 8), true).ShowPage("main")
+		return nil
+	})
 }
 
 func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
