@@ -3,7 +3,9 @@ package gui
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -12,6 +14,10 @@ import (
 
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+)
+
+var (
+	ErrEmptyJSON = errors.New("empty json")
 )
 
 type Gui struct {
@@ -261,4 +267,22 @@ func (g *Gui) parseValue(node *tview.TreeNode) interface{} {
 	}
 
 	return v
+}
+func UnMarshalJSON(in io.Reader) (interface{}, error) {
+	b, err := ioutil.ReadAll(in)
+	if err != nil {
+		return nil, err
+	}
+	if len(b) == 0 {
+		log.Println(err)
+		return nil, ErrEmptyJSON
+	}
+
+	var i interface{}
+	if err := json.Unmarshal(b, &i); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return i, nil
 }

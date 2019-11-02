@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -19,10 +17,6 @@ import (
 var (
 	enableLog = flag.Bool("log", false, "enable log")
 	url       = flag.String("url", "", "get json from url")
-)
-
-var (
-	errEmptyJSON = errors.New("empty json")
 )
 
 func printError(err error) int {
@@ -58,15 +52,11 @@ func run() int {
 			return printError(err)
 		}
 
-		b, err := ioutil.ReadAll(resp.Body)
+		i, err := gui.UnMarshalJSON(resp.Body)
 		if err != nil {
 			return printError(err)
 		}
 
-		var i interface{}
-		if err := json.Unmarshal(b, &i); err != nil {
-			return printError(err)
-		}
 		if err := gui.New().Run(i); err != nil {
 			return printError(err)
 		}
@@ -74,16 +64,8 @@ func run() int {
 	}
 
 	if !terminal.IsTerminal(0) {
-		b, err := ioutil.ReadAll(os.Stdin)
+		i, err := gui.UnMarshalJSON(os.Stdin)
 		if err != nil {
-			return printError(err)
-		}
-		if len(b) == 0 {
-			return printError(err)
-		}
-
-		var i interface{}
-		if err := json.Unmarshal(b, &i); err != nil {
 			return printError(err)
 		}
 
