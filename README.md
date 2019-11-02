@@ -44,6 +44,7 @@ $ tson -url http://gorilla/likes/json
 | r      | read from file      |
 | s      | save to file        |
 | a      | add new node        |
+| A      | add new value       |
 | Enter  | edit node           |
 | /      | search nodes        |
 
@@ -85,6 +86,27 @@ then you will get new tree as following.
 └──{object}
    └──name
       └──gorilla
+```
+
+Also, You can use `A` to add new value to current node.
+
+For example, you have following tree.
+
+```
+{object} <- your cursor in there
+└──name
+   └──gorilla
+```
+
+If you input `{"age": 26}` and press add button,
+then you will get new tree as following.
+
+```
+{object} <- your cursor in there
+├──name
+│  └──gorilla
+└──age
+   └──26
 ```
 
 # Author
