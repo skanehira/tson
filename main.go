@@ -46,33 +46,30 @@ func init() {
 }
 
 func run() int {
+	var i interface{}
 	if *url != "" {
 		resp, err := http.Get(*url)
 		if err != nil {
 			return printError(err)
 		}
 
-		i, err := gui.UnMarshalJSON(resp.Body)
+		i, err = gui.UnMarshalJSON(resp.Body)
 		if err != nil {
 			return printError(err)
 		}
-
-		if err := gui.New().Run(i); err != nil {
-			return printError(err)
-		}
-		return 0
 	}
 
 	if !terminal.IsTerminal(0) {
-		i, err := gui.UnMarshalJSON(os.Stdin)
+		var err error
+		i, err = gui.UnMarshalJSON(os.Stdin)
 		if err != nil {
 			return printError(err)
 		}
+	}
 
-		if err := gui.New().Run(i); err != nil {
-			log.Println(err)
-			return 1
-		}
+	if err := gui.New().Run(i); err != nil {
+		log.Println(err)
+		return 1
 	}
 	return 0
 }
