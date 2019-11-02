@@ -27,18 +27,8 @@ func NewTree() *Tree {
 
 func (t *Tree) UpdateView(g *Gui, i interface{}) {
 	g.App.QueueUpdateDraw(func() {
-		r := reflect.ValueOf(i)
 
-		var root *tview.TreeNode
-		switch r.Kind() {
-		case reflect.Map:
-			root = tview.NewTreeNode("{object}").SetReference(Reference{JSONType: Object})
-		case reflect.Slice:
-			root = tview.NewTreeNode("{array}").SetReference(Reference{JSONType: Array})
-		default:
-			root = tview.NewTreeNode("{value}").SetReference(Reference{JSONType: Key})
-		}
-
+		root := NewRootTreeNode(i)
 		root.SetChildren(t.AddNode(i))
 		t.SetRoot(root).SetCurrentNode(root)
 
@@ -175,4 +165,19 @@ func parseValueType(text string) ValueType {
 
 	log.Println(String.String())
 	return String
+}
+
+func NewRootTreeNode(i interface{}) *tview.TreeNode {
+	r := reflect.ValueOf(i)
+
+	var root *tview.TreeNode
+	switch r.Kind() {
+	case reflect.Map:
+		root = tview.NewTreeNode("{object}").SetReference(Reference{JSONType: Object})
+	case reflect.Slice:
+		root = tview.NewTreeNode("{array}").SetReference(Reference{JSONType: Array})
+	default:
+		root = tview.NewTreeNode("{value}").SetReference(Reference{JSONType: Key})
+	}
+	return root
 }
