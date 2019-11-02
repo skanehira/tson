@@ -143,6 +143,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			g.SaveJSON()
 		case '/':
 			g.Search()
+		case 'a':
+			g.AddNode()
 		}
 
 		return event

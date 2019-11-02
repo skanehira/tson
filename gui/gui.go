@@ -266,6 +266,32 @@ func (g *Gui) parseValue(node *tview.TreeNode) interface{} {
 
 	return v
 }
+
+func (g *Gui) AddNode() {
+	labels := []string{"json"}
+	g.Form(labels, "add", "add new node", "add_new_node", 7, func(values map[string]string) error {
+		j := values[labels[0]]
+		if j == "" {
+			log.Println(ErrEmptyJSON)
+			return ErrEmptyJSON
+		}
+
+		buf := bytes.NewBufferString(j)
+		i, err := UnMarshalJSON(buf)
+		if err != nil {
+			return err
+		}
+
+		newNode := NewRootTreeNode(i)
+		newNode.SetChildren(g.Tree.AddNode(i))
+		g.Tree.GetCurrentNode().AddChild(newNode)
+		// update new origin root node
+		g.Tree.OriginRoot = g.Tree.GetRoot()
+
+		return nil
+	})
+}
+
 func UnMarshalJSON(in io.Reader) (interface{}, error) {
 	b, err := ioutil.ReadAll(in)
 	if err != nil {
