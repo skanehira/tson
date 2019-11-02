@@ -135,21 +135,19 @@ func (g *Gui) Form(fieldLabel []string, doneLabel, title, pageName string,
 func (g *Gui) LoadJSON() {
 	labels := []string{"file"}
 	g.Form(labels, "read", "read from file", "read_from_file", 7, func(values map[string]string) error {
-		file := values[labels[0]]
-		b, err := ioutil.ReadFile(file)
+		fileName := values[labels[0]]
+		file, err := os.Open(fileName)
 		if err != nil {
-			log.Println(fmt.Sprintf("can't read file: %s", err))
+			log.Println(fmt.Sprintf("can't open file: %s", err))
 			return err
 		}
 
-		var i interface{}
-		if err := json.Unmarshal(b, &i); err != nil {
-			log.Println(fmt.Sprintf("can't unmarshal json: %s", err))
+		i, err := UnMarshalJSON(file)
+		if err != nil {
 			return err
 		}
 
 		g.Tree.UpdateView(g, i)
-
 		return nil
 	})
 }
@@ -271,6 +269,7 @@ func (g *Gui) parseValue(node *tview.TreeNode) interface{} {
 func UnMarshalJSON(in io.Reader) (interface{}, error) {
 	b, err := ioutil.ReadAll(in)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if len(b) == 0 {
