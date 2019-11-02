@@ -29,24 +29,25 @@ $ tson -url http://gorilla/likes/json
 ## Keybinding
 ### JSON tree
 
-| key    | description         |
-|--------|---------------------|
-| j      | move down           |
-| k      | move up             |
-| g      | move to the top     |
-| G      | move to the bottom  |
-| ctrl-f | page up             |
-| ctrl-b | page down           |
-| h      | hide current node   |
-| H      | collaspe all nodes  |
-| l      | expand current node |
-| L      | expand all nodes    |
-| r      | read from file      |
-| s      | save to file        |
-| a      | add new node        |
-| A      | add new value       |
-| Enter  | edit node           |
-| /      | search nodes        |
+| key    | description          |
+|--------|----------------------|
+| j      | move down            |
+| k      | move up              |
+| g      | move to the top      |
+| G      | move to the bottom   |
+| ctrl-f | page up              |
+| ctrl-b | page down            |
+| h      | hide current node    |
+| H      | collaspe all nodes   |
+| l      | expand current node  |
+| L      | expand all nodes     |
+| r      | read from file       |
+| s      | save to file         |
+| a      | add new node         |
+| A      | add new value        |
+| d      | clear children nodes |
+| Enter  | edit node            |
+| /      | search nodes         |
 
 ## About editing nodes
 When editing a node value, the JSON value type is determined based on the value.
