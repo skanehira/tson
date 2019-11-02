@@ -23,6 +23,21 @@ $ tson < test.json
 $ tson -url http://gorilla/likes/json
 ```
 
+### About Editing nodes
+When editing a node value, the JSON value type is determined based on the value.
+For example, after inputed `10.5` and saving the JSON to a file, it will be output as a float type `10.5`.
+If the value sorround with `"`, it will be output as string type always.
+The following is a list of conversion rules.
+
+| input value        | json type |
+|--------------------|-----------|
+| `gorilla`          | string    |
+| `10.5`             | float     |
+| `5`                | int       |
+| `true` or `false`  | boolean   |
+| `null`             | null      |
+| `"10"` or `"true"` | string    |
+
 ## Keybinding
 ### JSON tree
 
