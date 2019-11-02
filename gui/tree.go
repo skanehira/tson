@@ -133,6 +133,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			t.GetRoot().CollapseAll()
 		case 'd':
 			t.GetCurrentNode().ClearChildren()
+			newRoot := *g.Tree.GetRoot()
+			g.Tree.OriginRoot = &newRoot
 		case 'L':
 			t.GetRoot().ExpandAll()
 		case 'l':
