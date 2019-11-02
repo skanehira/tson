@@ -149,6 +149,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			g.AddNode()
 		case 'A':
 			g.AddValue()
+		case '?':
+			g.NaviPanel()
 		}
 
 		return event

@@ -22,6 +22,7 @@ var (
 
 type Gui struct {
 	Tree  *Tree
+	Navi  *Navi
 	App   *tview.Application
 	Pages *tview.Pages
 }
@@ -29,6 +30,7 @@ type Gui struct {
 func New() *Gui {
 	g := &Gui{
 		Tree:  NewTree(),
+		Navi:  NewNavi(),
 		App:   tview.NewApplication(),
 		Pages: tview.NewPages(),
 	}
@@ -38,6 +40,8 @@ func New() *Gui {
 func (g *Gui) Run(i interface{}) error {
 	g.Tree.UpdateView(g, i)
 	g.Tree.SetKeybindings(g)
+	g.Navi.UpdateView()
+	g.Navi.SetKeybindings(g)
 
 	grid := tview.NewGrid().
 		AddItem(g.Tree, 0, 0, 1, 1, 0, 0, true)
@@ -316,7 +320,14 @@ func (g *Gui) AddValue() {
 
 		return nil
 	})
+}
 
+func (g *Gui) NaviPanel() {
+	if g.Pages.HasPage(NaviPageName) {
+		g.Pages.ShowPage(NaviPageName)
+	} else {
+		g.Pages.AddAndSwitchToPage(NaviPageName, g.Modal(g.Navi, 0, 0), true).ShowPage("main")
+	}
 }
 
 func UnMarshalJSON(in io.Reader) (interface{}, error) {
