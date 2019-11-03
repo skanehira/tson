@@ -67,6 +67,10 @@ func run() int {
 		}
 	}
 
+	if i == nil {
+		return printError(gui.ErrEmptyJSON)
+	}
+
 	if err := gui.New().Run(i); err != nil {
 		log.Println(err)
 		return 1
