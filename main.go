@@ -52,7 +52,7 @@ func run() int {
 		if err != nil {
 			return printError(err)
 		}
-
+		defer resp.Body.Close()
 		i, err = gui.UnMarshalJSON(resp.Body)
 		if err != nil {
 			return printError(err)
