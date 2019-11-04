@@ -22,8 +22,9 @@ var (
 	moveBottom  = fmt.Sprintf(RedColor, "G", "	move bottom")
 	pageDown    = fmt.Sprintf(RedColor, "ctrl-b", "page down")
 	pageUp      = fmt.Sprintf(RedColor, "ctrl-f", "page up")
+	stopApp     = fmt.Sprintf(RedColor, "ctrl-c", "stop tson")
 	defaultNavi = strings.Join([]string{moveDown, moveUp, moveLeft,
-		moveRight, moveTop, moveBottom, pageDown, pageUp}, "\n")
+		moveRight, moveTop, moveBottom, pageDown, pageUp, stopApp}, "\n")
 )
 
 // tree keybinding
@@ -39,7 +40,12 @@ var (
 	clearChildrenNodes = fmt.Sprintf(RedColor, "d", "	clear children nodes")
 	editNodeValue      = fmt.Sprintf(RedColor, "Enter", "edit current node")
 	searchNodes        = fmt.Sprintf(RedColor, "/", "	search nodes")
-	treeNavi           = strings.Join([]string{hideNode, collaspeAllNode, expandNode, expandAllNode, readFile, saveFile, addNewNode, addNewValue, clearChildrenNodes, editNodeValue, searchNodes}, "\n")
+	toggleExpandNodes  = fmt.Sprintf(RedColor, "space", "	expand/collaspe nodes")
+	moveNextParentNode = fmt.Sprintf(RedColor, "ctrl-j", "move to next parent node")
+	movePreParentNode  = fmt.Sprintf(RedColor, "ctrl-k", "move to previous parent node")
+	treeNavi           = strings.Join([]string{hideNode, collaspeAllNode, expandNode, expandAllNode,
+		readFile, saveFile, addNewNode, addNewValue, clearChildrenNodes, editNodeValue, searchNodes,
+		moveNextParentNode, movePreParentNode}, "\n")
 )
 
 type Navi struct {
@@ -54,7 +60,7 @@ func NewNavi() *Navi {
 }
 
 func (n *Navi) UpdateView() {
-	navi := strings.Join([]string{defaultNavi, treeNavi}, "\n")
+	navi := strings.Join([]string{"", defaultNavi, "", treeNavi}, "\n")
 	n.SetText(navi)
 }
 

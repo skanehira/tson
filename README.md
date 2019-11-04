@@ -50,6 +50,8 @@ $ tson -url http://gorilla/likes/json
 | /      | search nodes                   |
 | ?      | show helps                     |
 | space  | expand/collaspe children nodes |
+| ctrl-j | move to next parent node       |
+| ctrk-k | move to next previous node     |
 | ctrl-c | exit tson                      |
 
 ### help

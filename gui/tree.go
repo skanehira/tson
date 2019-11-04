@@ -8,7 +8,13 @@ import (
 	"strings"
 
 	"github.com/gdamore/tcell"
+	"github.com/gofrs/uuid"
 	"github.com/rivo/tview"
+)
+
+const (
+	moveToNext int = iota + 1
+	moveToPre
 )
 
 type Tree struct {
@@ -48,12 +54,13 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 				SetChildren(t.AddNode(v))
 			r := reflect.ValueOf(v)
 
+			id := uuid.Must(uuid.NewV4()).String()
 			if r.Kind() == reflect.Slice {
-				newNode.SetReference(Reference{JSONType: Array})
+				newNode.SetReference(Reference{ID: id, JSONType: Array})
 			} else if r.Kind() == reflect.Map {
-				newNode.SetReference(Reference{JSONType: Object})
+				newNode.SetReference(Reference{ID: id, JSONType: Object})
 			} else {
-				newNode.SetReference(Reference{JSONType: Key})
+				newNode.SetReference(Reference{ID: id, JSONType: Key})
 			}
 
 			log.Printf("key:%v value:%v value_kind:%v", k, v, newNode.GetReference())
@@ -61,12 +68,13 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 		}
 	case []interface{}:
 		for _, v := range node {
+			id := uuid.Must(uuid.NewV4()).String()
 			switch n := v.(type) {
 			case map[string]interface{}:
 				r := reflect.ValueOf(n)
 				if r.Kind() != reflect.Slice {
 					objectNode := tview.NewTreeNode("{object}").
-						SetChildren(t.AddNode(v)).SetReference(Reference{JSONType: Object})
+						SetChildren(t.AddNode(v)).SetReference(Reference{ID: id, JSONType: Object})
 
 					log.Printf("value:%v value_kind:%v", v, "object")
 					nodes = append(nodes, objectNode)
@@ -95,8 +103,9 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 		}
 
 		log.Printf("value_type:%v", valueType)
+		id := uuid.Must(uuid.NewV4()).String()
 		nodes = append(nodes, t.NewNodeWithLiteral(node).
-			SetReference(Reference{JSONType: Value, ValueType: valueType}))
+			SetReference(Reference{ID: id, JSONType: Value, ValueType: valueType}))
 	}
 	return nodes
 }
@@ -156,7 +165,39 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			current.SetExpanded(!current.IsExpanded())
 		}
 
+		switch event.Key() {
+		case tcell.KeyCtrlJ:
+			t.moveParent(moveToNext)
+		case tcell.KeyCtrlK:
+			t.moveParent(moveToPre)
+		}
+
 		return event
+	})
+}
+
+func (t *Tree) moveParent(movement int) {
+	current := t.GetCurrentNode()
+	t.GetRoot().Walk(func(node, parent *tview.TreeNode) bool {
+		// TODO set id to compare id
+		if parent != nil {
+			children := parent.GetChildren()
+			for i, n := range children {
+				if n.GetReference().(Reference).ID == current.GetReference().(Reference).ID {
+					if movement == moveToNext {
+						if i < len(children)-1 {
+							t.SetCurrentNode(children[i+1])
+						}
+					} else if movement == moveToPre {
+						if i > 0 {
+							t.SetCurrentNode(children[i-1])
+						}
+					}
+				}
+			}
+		}
+
+		return true
 	})
 }
 

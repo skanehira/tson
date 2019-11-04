@@ -44,6 +44,7 @@ func (v ValueType) String() string {
 }
 
 type Reference struct {
+	ID        string
 	JSONType  JSONType
 	ValueType ValueType
 }
