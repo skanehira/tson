@@ -151,6 +151,9 @@ func (t *Tree) SetKeybindings(g *Gui) {
 			g.AddValue()
 		case '?':
 			g.NaviPanel()
+		case ' ':
+			current := t.GetCurrentNode()
+			current.SetExpanded(!current.IsExpanded())
 		}
 
 		return event
