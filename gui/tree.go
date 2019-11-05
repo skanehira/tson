@@ -179,7 +179,6 @@ func (t *Tree) SetKeybindings(g *Gui) {
 func (t *Tree) moveParent(movement int) {
 	current := t.GetCurrentNode()
 	t.GetRoot().Walk(func(node, parent *tview.TreeNode) bool {
-		// TODO set id to compare id
 		if parent != nil {
 			children := parent.GetChildren()
 			for i, n := range children {
@@ -187,10 +186,12 @@ func (t *Tree) moveParent(movement int) {
 					if movement == moveToNext {
 						if i < len(children)-1 {
 							t.SetCurrentNode(children[i+1])
+							return false
 						}
 					} else if movement == moveToPre {
 						if i > 0 {
 							t.SetCurrentNode(children[i-1])
+							return false
 						}
 					}
 				}
