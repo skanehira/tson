@@ -186,7 +186,7 @@ func (g *Gui) walk(nodes []*tview.TreeNode, text string) []*tview.TreeNode {
 
 	for _, child := range nodes {
 		log.Println(child.GetText())
-		if strings.Index(strings.ToLower(child.GetText()), text) != -1 {
+		if strings.Index(strings.ToLower(child.GetText()), strings.ToLower(text)) != -1 {
 			newNodes = append(newNodes, child)
 		} else {
 			newNodes = append(newNodes, g.walk(child.GetChildren(), text)...)
