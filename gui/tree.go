@@ -139,7 +139,7 @@ func (t *Tree) SetKeybindings(g *Gui) {
 		case 'h':
 			t.GetCurrentNode().SetExpanded(false)
 		case 'H':
-			t.GetRoot().CollapseAll()
+			t.CollapseValues(t.GetRoot())
 		case 'd':
 			t.GetCurrentNode().ClearChildren()
 			newRoot := *g.Tree.GetRoot()
@@ -173,6 +173,20 @@ func (t *Tree) SetKeybindings(g *Gui) {
 		}
 
 		return event
+	})
+}
+
+func (t *Tree) CollapseValues(node *tview.TreeNode) {
+	node.Walk(func(node, parent *tview.TreeNode) bool {
+		ref := node.GetReference().(Reference)
+		if ref.JSONType == Value {
+			pRef := parent.GetReference().(Reference)
+			t := pRef.JSONType
+			if t == Key || t == Array {
+				parent.SetExpanded(false)
+			}
+		}
+		return true
 	})
 }
 
