@@ -9,11 +9,16 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 
+	"github.com/creack/pty"
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
@@ -201,23 +206,26 @@ func (g *Gui) SaveJSON() {
 	g.Form(labels, "save", "save to file", "save_to_file", 7, func(values map[string]string) error {
 		file := values[labels[0]]
 		file = os.ExpandEnv(file)
-
-		var buf bytes.Buffer
-		enc := json.NewEncoder(&buf)
-		enc.SetIndent("", "  ")
-
-		if err := enc.Encode(g.makeJSON(g.Tree.GetRoot())); err != nil {
-			log.Println(fmt.Sprintf("can't marshal json: %s", err))
-			return err
-		}
-
-		if err := ioutil.WriteFile(file, buf.Bytes(), 0666); err != nil {
-			log.Println(fmt.Sprintf("can't create file: %s", err))
-			return err
-		}
-
-		return nil
+		return g.SaveJSONToFile(file)
 	})
+}
+
+func (g *Gui) SaveJSONToFile(file string) error {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetIndent("", "  ")
+
+	if err := enc.Encode(g.makeJSON(g.Tree.GetRoot())); err != nil {
+		log.Println(fmt.Sprintf("can't marshal json: %s", err))
+		return err
+	}
+
+	if err := ioutil.WriteFile(file, buf.Bytes(), 0666); err != nil {
+		log.Println(fmt.Sprintf("can't create file: %s", err))
+		return err
+	}
+
+	return nil
 }
 
 func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
@@ -327,6 +335,84 @@ func (g *Gui) NaviPanel() {
 		g.Pages.ShowPage(NaviPageName)
 	} else {
 		g.Pages.AddAndSwitchToPage(NaviPageName, g.Modal(g.Navi, 0, 0), true).ShowPage("main")
+	}
+}
+
+func (g *Gui) EditWithEditor() {
+	f, err := ioutil.TempFile("", "tson")
+	if err != nil {
+		log.Println(fmt.Sprintf("can't create temp file: %s", err))
+		g.Message(err.Error(), "main", func() {})
+		return
+	}
+
+	defer os.RemoveAll(f.Name())
+
+	if err := g.SaveJSONToFile(f.Name()); err != nil {
+		log.Println(fmt.Sprintf("can't write to temp file: %s", err))
+		g.Message(err.Error(), "main", func() {})
+		return
+	}
+
+	if b := g.App.Suspend(func() {
+		editor := os.Getenv("EDITOR")
+		if editor == "" {
+			log.Println(fmt.Sprintf("$EDITOR is empty: %s", err))
+			g.Message(err.Error(), "main", func() {})
+			return
+		}
+
+		cmd := exec.Command(editor, f.Name())
+
+		// Start the command with a pty.
+		ptmx, err := pty.Start(cmd)
+		if err != nil {
+			g.Message(err.Error(), "main", func() {})
+			return
+		}
+		// Make sure to close the pty at the end.
+		defer func() { _ = ptmx.Close() }() // Best effort.
+
+		// Handle pty size.
+		ch := make(chan os.Signal, 1)
+		signal.Notify(ch, syscall.SIGWINCH)
+		go func() {
+			for range ch {
+				if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
+					log.Printf("can't resizing pty: %s", err)
+				}
+			}
+		}()
+		ch <- syscall.SIGWINCH // Initial resize.
+
+		// Set stdin in raw mode.
+		oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
+		if err != nil {
+			log.Println(fmt.Sprintf("can't make terminal raw mode: %s", err))
+			g.Message(err.Error(), "main", func() {})
+			return
+		}
+		defer func() { _ = terminal.Restore(int(os.Stdin.Fd()), oldState) }() // Best effort.
+
+		// Copy stdin to the pty and the pty to stdout.
+		go func() {
+			io.Copy(ptmx, os.Stdin)
+		}()
+
+		io.Copy(os.Stdout, ptmx)
+
+		i, err := UnMarshalJSON(f)
+		if err != nil {
+			log.Println(fmt.Sprintf("can't read from file: %s", err))
+			g.Message(err.Error(), "main", func() {})
+			return
+		}
+
+		g.Tree.UpdateView(g, i)
+	}); !b {
+		log.Println(fmt.Sprintf("can't edit: %s", err))
+		g.Message(err.Error(), "main", func() {})
+		return
 	}
 }
 
