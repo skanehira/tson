@@ -38,7 +38,7 @@ $ tson -url http://gorilla/likes/json
 | ctrl-f | page up                        |
 | ctrl-b | page down                      |
 | h      | hide current node              |
-| H      | collaspe all nodes             |
+| H      | collaspe value nodes           |
 | l      | expand current node            |
 | L      | expand all nodes               |
 | r      | read from file                 |
