@@ -29,30 +29,31 @@ $ tson -url http://gorilla/likes/json
 ## Keybinding
 ### JSON tree
 
-| key    | description                    |
-|--------|--------------------------------|
-| j      | move down                      |
-| k      | move up                        |
-| g      | move to the top                |
-| G      | move to the bottom             |
-| ctrl-f | page up                        |
-| ctrl-b | page down                      |
-| h      | hide current node              |
-| H      | collaspe value nodes           |
-| l      | expand current node            |
-| L      | expand all nodes               |
-| r      | read from file                 |
-| s      | save to file                   |
-| a      | add new node                   |
-| A      | add new value                  |
-| d      | clear children nodes           |
-| Enter  | edit node                      |
-| /      | search nodes                   |
-| ?      | show helps                     |
-| space  | expand/collaspe children nodes |
-| ctrl-j | move to next parent node       |
-| ctrk-k | move to next previous node     |
-| ctrl-c | exit tson                      |
+| key    | description                                 |
+|--------|---------------------------------------------|
+| j      | move down                                   |
+| k      | move up                                     |
+| g      | move to the top                             |
+| G      | move to the bottom                          |
+| ctrl-f | page up                                     |
+| ctrl-b | page down                                   |
+| h      | hide current node                           |
+| H      | collaspe value nodes                        |
+| l      | expand current node                         |
+| L      | expand all nodes                            |
+| r      | read from file                              |
+| s      | save to file                                |
+| a      | add new node                                |
+| A      | add new value                               |
+| d      | clear children nodes                        |
+| e      | edit json with $EDITOR(only when use --url) |
+| Enter  | edit node                                   |
+| /      | search nodes                                |
+| ?      | show helps                                  |
+| space  | expand/collaspe children nodes              |
+| ctrl-j | move to next parent node                    |
+| ctrk-k | move to next previous node                  |
+| ctrl-c | exit tson                                   |
 
 ### help
 | key    | description        |
