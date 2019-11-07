@@ -362,7 +362,13 @@ func (g *Gui) EditWithEditor() {
 			return
 		}
 
-		cmd := exec.Command(editor, f.Name())
+		var args []string
+		if editor == "vim" {
+			args = append(args, []string{"-c", "set ft=json", f.Name()}...)
+		} else {
+			args = append(args, f.Name())
+		}
+		cmd := exec.Command(editor, args...)
 
 		// Start the command with a pty.
 		ptmx, err := pty.Start(cmd)
@@ -371,7 +377,11 @@ func (g *Gui) EditWithEditor() {
 			return
 		}
 		// Make sure to close the pty at the end.
-		defer func() { _ = ptmx.Close() }() // Best effort.
+		defer func() {
+			if err := ptmx.Close(); err != nil {
+				log.Printf("can't close pty: %s", err)
+			}
+		}()
 
 		// Handle pty size.
 		ch := make(chan os.Signal, 1)
@@ -392,7 +402,11 @@ func (g *Gui) EditWithEditor() {
 			g.Message(err.Error(), "main", func() {})
 			return
 		}
-		defer func() { _ = terminal.Restore(int(os.Stdin.Fd()), oldState) }() // Best effort.
+		defer func() {
+			if err := terminal.Restore(int(os.Stdin.Fd()), oldState); err != nil {
+				log.Printf("can't restore terminal: %s", err)
+			}
+		}()
 
 		// Copy stdin to the pty and the pty to stdout.
 		go func() {
