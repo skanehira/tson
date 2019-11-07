@@ -3,6 +3,7 @@ module github.com/skanehira/tson
 go 1.13
 
 require (
+	github.com/creack/pty v1.1.9
 	github.com/gdamore/tcell v1.3.0
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
