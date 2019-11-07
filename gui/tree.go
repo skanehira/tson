@@ -9,7 +9,6 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/gofrs/uuid"
 	"github.com/rivo/tview"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 const (
@@ -157,9 +156,7 @@ func (t *Tree) SetKeybindings(g *Gui) {
 		case '?':
 			g.NaviPanel()
 		case 'e':
-			if terminal.IsTerminal(0) {
-				g.EditWithEditor()
-			}
+			g.EditWithEditor()
 		case ' ':
 			current := t.GetCurrentNode()
 			current.SetExpanded(!current.IsExpanded())

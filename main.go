@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"syscall"
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/skanehira/tson/gui"
@@ -43,6 +44,7 @@ func init() {
 	} else {
 		log.SetOutput(ioutil.Discard)
 	}
+
 }
 
 func run() int {
@@ -57,13 +59,16 @@ func run() int {
 		if err != nil {
 			return printError(err)
 		}
-	}
+	} else {
+		if !terminal.IsTerminal(0) {
+			var err error
+			i, err = gui.UnMarshalJSON(os.Stdin)
+			if err != nil {
+				return printError(err)
+			}
 
-	if !terminal.IsTerminal(0) {
-		var err error
-		i, err = gui.UnMarshalJSON(os.Stdin)
-		if err != nil {
-			return printError(err)
+			// set tview tty to stdin
+			os.Stdin = os.NewFile(uintptr(syscall.Stderr), "/dev/tty")
 		}
 	}
 
