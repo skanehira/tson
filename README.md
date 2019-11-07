@@ -47,13 +47,14 @@ $ tson -url http://gorilla/likes/json
 | A      | add new value                               |
 | d      | clear children nodes                        |
 | e      | edit json with $EDITOR(only when use --url) |
+| q      | quit tson                                   |
 | Enter  | edit node                                   |
 | /      | search nodes                                |
 | ?      | show helps                                  |
 | space  | expand/collaspe children nodes              |
 | ctrl-j | move to next parent node                    |
 | ctrk-k | move to next previous node                  |
-| ctrl-c | exit tson                                   |
+| ctrl-c | quit tson                                   |
 
 ### help
 | key    | description        |

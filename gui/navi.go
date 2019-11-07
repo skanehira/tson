@@ -39,6 +39,7 @@ var (
 	addNewValue        = fmt.Sprintf(RedColor, "A", "	add new value")
 	clearChildrenNodes = fmt.Sprintf(RedColor, "d", "	clear children nodes")
 	editNodes          = fmt.Sprintf(RedColor, "e", "	edit json with $EDITOR(only when use --url)")
+	quitTson           = fmt.Sprintf(RedColor, "q", "	quit tson")
 	editNodeValue      = fmt.Sprintf(RedColor, "Enter", "edit current node")
 	searchNodes        = fmt.Sprintf(RedColor, "/", "	search nodes")
 	toggleExpandNodes  = fmt.Sprintf(RedColor, "space", "	expand/collaspe nodes")
@@ -46,7 +47,7 @@ var (
 	movePreParentNode  = fmt.Sprintf(RedColor, "ctrl-k", "move to previous parent node")
 	treeNavi           = strings.Join([]string{hideNode, collaspeAllNode, expandNode, expandAllNode,
 		readFile, saveFile, addNewNode, addNewValue, clearChildrenNodes, editNodeValue, searchNodes,
-		moveNextParentNode, movePreParentNode, editNodes}, "\n")
+		moveNextParentNode, movePreParentNode, editNodes, quitTson}, "\n")
 )
 
 type Navi struct {

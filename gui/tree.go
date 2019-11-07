@@ -163,6 +163,8 @@ func (t *Tree) SetKeybindings(g *Gui) {
 		case ' ':
 			current := t.GetCurrentNode()
 			current.SetExpanded(!current.IsExpanded())
+		case 'q':
+			g.App.Stop()
 		}
 
 		switch event.Key() {
