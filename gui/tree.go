@@ -2,7 +2,6 @@ package gui
 
 import (
 	"fmt"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -64,7 +63,6 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 				newNode.SetReference(Reference{ID: id, JSONType: Key})
 			}
 
-			log.Printf("key:%v value:%v value_kind:%v", k, v, newNode.GetReference())
 			nodes = append(nodes, newNode)
 		}
 	case []interface{}:
@@ -77,7 +75,6 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 					objectNode := tview.NewTreeNode("{object}").
 						SetChildren(t.AddNode(v)).SetReference(Reference{ID: id, JSONType: Object})
 
-					log.Printf("value:%v value_kind:%v", v, "object")
 					nodes = append(nodes, objectNode)
 				}
 			default:
@@ -85,7 +82,6 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 			}
 		}
 	default:
-		log.Printf("value:%v value_kind:%v", node, "value")
 		ref := reflect.ValueOf(node)
 		var valueType ValueType
 		switch ref.Kind() {
@@ -103,7 +99,6 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 			}
 		}
 
-		log.Printf("value_type:%v", valueType)
 		id := uuid.Must(uuid.NewV4()).String()
 		nodes = append(nodes, t.NewNodeWithLiteral(node).
 			SetReference(Reference{ID: id, JSONType: Value, ValueType: valueType}))
@@ -235,7 +230,6 @@ func parseValueType(text string) ValueType {
 		return Int
 	}
 
-	log.Println(String.String())
 	return String
 }
 
