@@ -38,7 +38,7 @@ var (
 	addNewNode         = fmt.Sprintf(RedColor, "a", "	add new node")
 	addNewValue        = fmt.Sprintf(RedColor, "A", "	add new value")
 	clearChildrenNodes = fmt.Sprintf(RedColor, "d", "	clear children nodes")
-	editNodes          = fmt.Sprintf(RedColor, "e", "	edit json with $EDITOR(only linux)")
+	editNodes          = fmt.Sprintf(RedColor, "e", "	edit json with $EDITOR")
 	quitTson           = fmt.Sprintf(RedColor, "q", "	quit tson")
 	editNodeValue      = fmt.Sprintf(RedColor, "Enter", "edit current node")
 	searchNodes        = fmt.Sprintf(RedColor, "/", "	search nodes")

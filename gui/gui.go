@@ -339,22 +339,22 @@ func (g *Gui) NaviPanel() {
 }
 
 func (g *Gui) EditWithEditor() {
-	f, err := ioutil.TempFile("", "tson")
-	if err != nil {
-		log.Println(fmt.Sprintf("can't create temp file: %s", err))
-		g.Message(err.Error(), "main", func() {})
-		return
-	}
+	g.App.Suspend(func() {
+		f, err := ioutil.TempFile("", "tson")
+		if err != nil {
+			log.Println(fmt.Sprintf("can't create temp file: %s", err))
+			g.Message(err.Error(), "main", func() {})
+			return
+		}
+		f.Close()
+		defer os.RemoveAll(f.Name())
 
-	defer os.RemoveAll(f.Name())
+		if err := g.SaveJSONToFile(f.Name()); err != nil {
+			log.Println(fmt.Sprintf("can't write to temp file: %s", err))
+			g.Message(err.Error(), "main", func() {})
+			return
+		}
 
-	if err := g.SaveJSONToFile(f.Name()); err != nil {
-		log.Println(fmt.Sprintf("can't write to temp file: %s", err))
-		g.Message(err.Error(), "main", func() {})
-		return
-	}
-
-	if b := g.App.Suspend(func() {
 		editor := os.Getenv("EDITOR")
 		if editor == "" {
 			log.Println(fmt.Sprintf("$EDITOR is empty: %s", err))
@@ -409,11 +409,15 @@ func (g *Gui) EditWithEditor() {
 		}()
 
 		// Copy stdin to the pty and the pty to stdout.
-		go func() {
-			io.Copy(ptmx, os.Stdin)
-		}()
-
+		go io.Copy(ptmx, os.Stdin)
 		io.Copy(os.Stdout, ptmx)
+
+		f, err = os.Open(f.Name())
+		if err != nil {
+			log.Println(fmt.Sprintf("can't open file: %s", err))
+			g.Message(err.Error(), "main", func() {})
+			return
+		}
 
 		i, err := UnMarshalJSON(f)
 		if err != nil {
@@ -423,11 +427,7 @@ func (g *Gui) EditWithEditor() {
 		}
 
 		g.Tree.UpdateView(g, i)
-	}); !b {
-		log.Println(fmt.Sprintf("can't edit: %s", err))
-		g.Message(err.Error(), "main", func() {})
-		return
-	}
+	})
 }
 
 func UnMarshalJSON(in io.Reader) (interface{}, error) {
