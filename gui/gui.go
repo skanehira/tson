@@ -17,6 +17,7 @@ import (
 
 	"github.com/creack/pty"
 	"github.com/gdamore/tcell"
+	"github.com/micmonay/keybd_event"
 	"github.com/rivo/tview"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -24,6 +25,8 @@ import (
 var (
 	ErrEmptyJSON = errors.New("empty json")
 )
+
+var kb keybd_event.KeyBonding
 
 type Gui struct {
 	Tree  *Tree
@@ -43,6 +46,20 @@ func New() *Gui {
 }
 
 func (g *Gui) Run(i interface{}) error {
+	var err error
+	kb, err = keybd_event.NewKeyBonding()
+	if err != nil {
+		panic(err)
+	}
+
+	// For linux, it is very important wait 2 seconds
+	//if runtime.GOOS == "linux" {
+	//	time.Sleep(2 * time.Second)
+	//}
+
+	//set keys
+	kb.SetKeys(keybd_event.VK_A, keybd_event.VK_B)
+
 	g.Tree.UpdateView(g, i)
 	g.Tree.SetKeybindings(g)
 	g.Navi.UpdateView()
@@ -428,6 +445,10 @@ func (g *Gui) EditWithEditor() {
 
 		g.Tree.UpdateView(g, i)
 	})
+
+	if err := kb.Launching(); err != nil {
+		panic(err)
+	}
 }
 
 func UnMarshalJSON(in io.Reader) (interface{}, error) {
