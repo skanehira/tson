@@ -357,8 +357,9 @@ func (g *Gui) EditWithEditor() {
 
 		editor := os.Getenv("EDITOR")
 		if editor == "" {
-			log.Println(fmt.Sprintf("$EDITOR is empty: %s", err))
-			g.Message(err.Error(), "main", func() {})
+			msg := fmt.Sprint("$EDITOR is empty")
+			log.Println(msg)
+			g.Message(msg, "main", func() {})
 			return
 		}
 
