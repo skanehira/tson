@@ -67,15 +67,15 @@ func (t *Tree) AddNode(node interface{}) []*tview.TreeNode {
 	case []interface{}:
 		for _, v := range node {
 			id := uuid.Must(uuid.NewV4()).String()
-			switch n := v.(type) {
+			switch v.(type) {
 			case map[string]interface{}:
-				r := reflect.ValueOf(n)
-				if r.Kind() != reflect.Slice {
-					objectNode := tview.NewTreeNode("{object}").
-						SetChildren(t.AddNode(v)).SetReference(Reference{ID: id, JSONType: Object})
-
-					nodes = append(nodes, objectNode)
-				}
+				objectNode := tview.NewTreeNode("{object}").
+					SetChildren(t.AddNode(v)).SetReference(Reference{ID: id, JSONType: Object})
+				nodes = append(nodes, objectNode)
+			case []interface{}:
+				arrayNode := tview.NewTreeNode("{array}").
+					SetChildren(t.AddNode(v)).SetReference(Reference{ID: id, JSONType: Array})
+				nodes = append(nodes, arrayNode)
 			default:
 				nodes = append(nodes, t.AddNode(v)...)
 			}
