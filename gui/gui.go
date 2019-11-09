@@ -150,6 +150,7 @@ func (g *Gui) LoadJSON() {
 			log.Println(fmt.Sprintf("can't open file: %s", err))
 			return err
 		}
+		defer file.Close()
 
 		i, err := UnMarshalJSON(file)
 		if err != nil {
@@ -419,6 +420,7 @@ func (g *Gui) EditWithEditor() {
 			g.Message(err.Error(), "main", func() {})
 			return
 		}
+		defer f.Close()
 
 		i, err := UnMarshalJSON(f)
 		if err != nil {
