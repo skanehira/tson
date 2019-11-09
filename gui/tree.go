@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	moveToNext int = iota + 1
-	moveToPre
+	moveNext int = iota + 1
+	movePre
 )
 
 type Tree struct {
@@ -166,9 +166,9 @@ func (t *Tree) SetKeybindings(g *Gui) {
 
 		switch event.Key() {
 		case tcell.KeyCtrlJ:
-			t.moveParent(moveToNext)
+			t.moveNode(moveNext)
 		case tcell.KeyCtrlK:
-			t.moveParent(moveToPre)
+			t.moveNode(movePre)
 		}
 
 		return event
@@ -189,19 +189,19 @@ func (t *Tree) CollapseValues(node *tview.TreeNode) {
 	})
 }
 
-func (t *Tree) moveParent(movement int) {
+func (t *Tree) moveNode(movement int) {
 	current := t.GetCurrentNode()
 	t.GetRoot().Walk(func(node, parent *tview.TreeNode) bool {
 		if parent != nil {
 			children := parent.GetChildren()
 			for i, n := range children {
 				if n.GetReference().(Reference).ID == current.GetReference().(Reference).ID {
-					if movement == moveToNext {
+					if movement == moveNext {
 						if i < len(children)-1 {
 							t.SetCurrentNode(children[i+1])
 							return false
 						}
-					} else if movement == moveToPre {
+					} else if movement == movePre {
 						if i > 0 {
 							t.SetCurrentNode(children[i-1])
 							return false
