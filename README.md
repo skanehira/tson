@@ -49,7 +49,7 @@ $ tson -url http://gorilla/likes/json
 | e      | edit json with $EDITOR         |
 | q      | quit tson                      |
 | Enter  | edit node                      |
-| /      | search nodes                   |
+| / or f | search nodes                   |
 | ?      | show helps                     |
 | space  | expand/collaspe children nodes |
 | ctrl-j | move to next parent node       |

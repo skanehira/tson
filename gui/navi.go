@@ -41,7 +41,7 @@ var (
 	editNodes          = fmt.Sprintf(RedColor, "e", "	edit json with $EDITOR")
 	quitTson           = fmt.Sprintf(RedColor, "q", "	quit tson")
 	editNodeValue      = fmt.Sprintf(RedColor, "Enter", "edit current node")
-	searchNodes        = fmt.Sprintf(RedColor, "/", "	search nodes")
+	searchNodes        = fmt.Sprintf(RedColor, "/ or f", "	search nodes")
 	toggleExpandNodes  = fmt.Sprintf(RedColor, "space", "	expand/collaspe nodes")
 	moveNextParentNode = fmt.Sprintf(RedColor, "ctrl-j", "move to next parent node")
 	movePreParentNode  = fmt.Sprintf(RedColor, "ctrl-k", "move to previous parent node")
