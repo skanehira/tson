@@ -348,7 +348,6 @@ func (g *Gui) EditWithEditor() {
 			return
 		}
 		f.Close()
-		defer os.RemoveAll(f.Name())
 
 		if err := g.SaveJSONToFile(f.Name()); err != nil {
 			log.Println(fmt.Sprintf("can't write to temp file: %s", err))
@@ -429,6 +428,7 @@ func (g *Gui) EditWithEditor() {
 			return
 		}
 
+		os.RemoveAll(f.Name())
 		g.Tree.UpdateView(g, i)
 	})
 }
