@@ -216,7 +216,7 @@ func (g *Gui) SaveJSONToFile(file string) error {
 	enc := json.NewEncoder(&buf)
 	enc.SetIndent("", "  ")
 
-	if err := enc.Encode(g.makeJSON(g.Tree.GetRoot())); err != nil {
+	if err := enc.Encode(g.MakeJSON(g.Tree.GetRoot())); err != nil {
 		log.Println(fmt.Sprintf("can't marshal json: %s", err))
 		return err
 	}
@@ -229,7 +229,7 @@ func (g *Gui) SaveJSONToFile(file string) error {
 	return nil
 }
 
-func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
+func (g *Gui) MakeJSON(node *tview.TreeNode) interface{} {
 	ref := node.GetReference().(Reference)
 	children := node.GetChildren()
 
@@ -237,13 +237,13 @@ func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
 	case Object:
 		i := make(map[string]interface{})
 		for _, n := range children {
-			i[n.GetText()] = g.makeJSON(n)
+			i[n.GetText()] = g.MakeJSON(n)
 		}
 		return i
 	case Array:
 		var i []interface{}
 		for _, n := range children {
-			i = append(i, g.makeJSON(n))
+			i = append(i, g.MakeJSON(n))
 		}
 		return i
 	case Key:
@@ -252,7 +252,7 @@ func (g *Gui) makeJSON(node *tview.TreeNode) interface{} {
 			return g.parseValue(v)
 		}
 		return map[string]interface{}{
-			node.GetText(): g.makeJSON(v),
+			node.GetText(): g.MakeJSON(v),
 		}
 	}
 
