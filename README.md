@@ -26,6 +26,32 @@ $ curl -X POST http://gorilla/likes/regist | tson
 $ tson -url http://gorilla/likes/json
 ```
 
+### Use `tson` as a library in your application
+You can use tson in your application as following.
+
+```go
+package main
+
+import (
+	"fmt"
+
+	tson "github.com/skanehira/tson/lib"
+)
+
+func main() {
+	j := []byte(`{"name":"gorilla"}`)
+
+	// tson.Edit([]byte) will return []byte, error
+	res, err := tson.Edit(j)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(string(res))
+}
+```
+
 ## Keybinding
 ### JSON tree
 
