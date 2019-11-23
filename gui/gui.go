@@ -247,6 +247,9 @@ func (g *Gui) MakeJSON(node *tview.TreeNode) interface{} {
 		}
 		return i
 	case Key:
+		if len(node.GetChildren()) == 0 {
+			return ""
+		}
 		v := node.GetChildren()[0]
 		if v.GetReference().(Reference).JSONType == Value {
 			return g.parseValue(v)
