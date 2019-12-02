@@ -216,7 +216,7 @@ func (g *Gui) SaveJSONToFile(file string) error {
 	enc := json.NewEncoder(&buf)
 	enc.SetIndent("", "  ")
 
-	if err := enc.Encode(g.MakeJSON(g.Tree.GetRoot())); err != nil {
+	if err := enc.Encode(g.MakeJSON(g.Tree.OriginRoot)); err != nil {
 		log.Println(fmt.Sprintf("can't marshal json: %s", err))
 		return err
 	}
