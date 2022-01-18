@@ -1,3 +1,4 @@
+# This repository is no longer to develop.
 # tson
 `tson` is JSON viewer and editor written in Go.
 This tool displays JSON as a tree and you can search and edit key or values.
